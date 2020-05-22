@@ -1,15 +1,14 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 export class UserItem extends Component {
-  state = {
-    id: "id",
-    login: "mojombo",
-    avatar_url: "https://avatars0.githubusercontent.com/u/1?v=4",
-    html_url: "https://github.com/mojombo"
+  static propTypes = {
+    //we can define what type of props we accept
+    user: PropTypes.object.isRequired
   };
 
   render() {
-    const { login, avatar_url, html_url } = this.state; //assign given values to local variables in render method
+    const { login, avatar_url, html_url } = this.props.user; //assign given values to local variables in render method
     return (
       <div className='card text-center'>
         <img
