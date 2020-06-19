@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const UserItem = ({ user: { login, avatar_url, html_url } }) => {
   // we take user from passed props and assign their values  login, avatar_url, html_url  so that they are available as local values
@@ -12,9 +13,9 @@ const UserItem = ({ user: { login, avatar_url, html_url } }) => {
       />
       <div className='h3'>{login}</div>
       <div>
-        <a href={html_url} className='btn btn-dark btn-sm my-1'>
+        <Link to={`/user/${login}`} className='btn btn-dark btn-sm my-1'>
           More
-        </a>
+        </Link>
       </div>
     </div>
   );

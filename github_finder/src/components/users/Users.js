@@ -4,6 +4,7 @@ import Spinner from "../layout/Spinner";
 import PropTypes from "prop-types";
 
 const Users = ({ users, loading }) => {
+  // we are taking those info from props and assigning them to local variables
   if (loading) {
     return <Spinner />;
   } else {
