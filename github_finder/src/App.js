@@ -8,6 +8,8 @@ import User from "./components/users/User";
 import Search from "./components/users/Search";
 
 import axios from "axios";
+
+import GihubState from "./context/github/GithubState";
 import "./App.css";
 
 const App = () => {
@@ -56,48 +58,50 @@ const App = () => {
 
   // we are using Switch to wrap multiple components in one router
   return (
-    <Router>
-      <div className='App'>
-        <Navbar />
-        <div className='container'>
-          <Alert alert={alert} />
-          <Switch>
-            <Route
-              exact
-              path='/'
-              render={(
-                props // we have to add Fragment below, if not we would have two parent elements, i.e. Search and Users
-              ) => (
-                <Fragment>
-                  <Search
-                    searchUsers={searchUsers}
-                    clearUsers={clearUsers}
-                    showClear={users.length > 0 ? true : false}
-                    setAlert={showAlert}
+    <GihubState>
+      <Router>
+        <div className='App'>
+          <Navbar />
+          <div className='container'>
+            <Alert alert={alert} />
+            <Switch>
+              <Route
+                exact
+                path='/'
+                render={(
+                  props // we have to add Fragment below, if not we would have two parent elements, i.e. Search and Users
+                ) => (
+                  <Fragment>
+                    <Search
+                      searchUsers={searchUsers}
+                      clearUsers={clearUsers}
+                      showClear={users.length > 0 ? true : false}
+                      setAlert={showAlert}
+                    />
+                    <Users loading={loading} users={users} />
+                  </Fragment>
+                )}
+              />
+              <Route exact path='/about' component={About} />
+              <Route
+                exact
+                path='/user/:login' //route param login, we will have access to id in our route (i.e. User) in props.match.params.login )
+                render={props => (
+                  <User
+                    {...props}
+                    getUser={getUser}
+                    getUserRepos={getUserRepos}
+                    user={user}
+                    repos={repos}
+                    loading={loading}
                   />
-                  <Users loading={loading} users={users} />
-                </Fragment>
-              )}
-            />
-            <Route exact path='/about' component={About} />
-            <Route
-              exact
-              path='/user/:login' //route param login, we will have access to id in our route (i.e. User) in props.match.params.login )
-              render={props => (
-                <User
-                  {...props}
-                  getUser={getUser}
-                  getUserRepos={getUserRepos}
-                  user={user}
-                  repos={repos}
-                  loading={loading}
-                />
-              )}
-            />
-          </Switch>
+                )}
+              />
+            </Switch>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </GihubState>
   );
 };
 
