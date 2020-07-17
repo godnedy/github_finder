@@ -9,10 +9,6 @@ const Search = ({ searchUsers, showClear, clearUsers, setAlert }) => {
     setText(e.target.value);
   };
 
-  // onSubmit(e) {
-  //   e.preventDefault();
-  //   console.log(this.state.text); // if I wouldn't use arrow function like below, then I'll need to call it this.onSubmit.bind(this)
-  // }
   const onSubmit = e => {
     e.preventDefault();
     if (text === "") {

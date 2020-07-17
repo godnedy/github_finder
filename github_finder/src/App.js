@@ -1,4 +1,4 @@
-import React, { Fragment, Component } from "react";
+import React, { Fragment, useState } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Alert from "./components/layout/Alert";
@@ -10,106 +10,95 @@ import Search from "./components/users/Search";
 import axios from "axios";
 import "./App.css";
 
-class App extends Component {
-  state = {
-    users: [],
-    user: {},
-    repos: [],
-    loading: false,
-    alert: null
-  };
+const App = () => {
+  const [users, setUsers] = useState([]);
+  const [user, setUser] = useState({});
 
-  async componentDidMount() {
-    //also lifecycle method
-    this.setState({ users: [], loading: true });
-    const res = await axios.get(`https://api.github.com/users?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}
-    &client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`); // async await so that we do not need get().then()
+  const [repos, setRepos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
 
-    this.setState({ users: res.data, loading: false });
-  }
-
-  searchUsers = async text => {
-    this.setState({ loading: true });
+  const searchUsers = async text => {
+    setLoading(true);
     const res = await axios.get(`https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}
     &client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`); // async await so that we do not need get().then()
 
-    this.setState({ users: res.data.items, loading: false });
+    setUsers(res.data.items);
+    setLoading(false);
   };
 
-  getUser = async username => {
-    this.setState({ loading: true });
+  const getUser = async username => {
+    setLoading(true);
     const res = await axios.get(`https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}
     &client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`); // async await so that we do not need get().then()
 
-    this.setState({ user: res.data, loading: false });
+    setUser(res.data);
+    setLoading(false);
   };
 
-  getUserRepos = async username => {
-    this.setState({ loading: true });
+  const getUserRepos = async username => {
+    setLoading(true);
     const res = await axios.get(`https://api.github.com/users/${username}/repos?per_page=5&sort=created:ascclient_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}
     &client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`); // async await so that we do not need get().then()
-
-    this.setState({ repos: res.data, loading: false });
+    setRepos(res.data);
+    setLoading(false);
   };
 
-  clearUsers = () => {
-    this.setState({ users: [], loading: false });
+  const clearUsers = () => {
+    setUsers([]);
+    setLoading(false);
   };
 
-  setAlert = (msg, type) => {
-    this.setState({ alert: { msg: msg, type: type } }); // we could have {msg, type} instead  {msg: msg, type: type }
-    setTimeout(() => this.setState({ alert: null }), 5000); // after 5s set alert to null , info will disappear
+  const showAlert = (msg, type) => {
+    setAlert({ msg: msg, type: type }); // we could have {msg, type} instead  {msg: msg, type: type }
+    setTimeout(() => setAlert(null), 5000); // after 5s set alert to null , info will disappear
   };
 
-  render() {
-    //lifecycle method, only one required
-    // we are using Switch to wrap multiple components in one router
-    const { users, user, repos, loading } = this.state;
-    return (
-      <Router>
-        <div className='App'>
-          <Navbar />
-          <div className='container'>
-            <Alert alert={this.state.alert} />
-            <Switch>
-              <Route
-                exact
-                path='/'
-                render={(
-                  props // we have to add Fragment below, if not we would have two parent elements, i.e. Search and Users
-                ) => (
-                  <Fragment>
-                    <Search
-                      searchUsers={this.searchUsers}
-                      clearUsers={this.clearUsers}
-                      showClear={users.length > 0 ? true : false}
-                      setAlert={this.setAlert}
-                    />
-                    <Users loading={loading} users={users} />
-                  </Fragment>
-                )}
-              />
-              <Route exact path='/about' component={About} />
-              <Route
-                exact
-                path='/user/:login' //route param login, we will have access to id in our route (i.e. User) in props.match.params.login )
-                render={props => (
-                  <User
-                    {...props}
-                    getUser={this.getUser}
-                    getUserRepos={this.getUserRepos}
-                    user={user}
-                    repos={repos}
-                    loading={loading}
+  // we are using Switch to wrap multiple components in one router
+  return (
+    <Router>
+      <div className='App'>
+        <Navbar />
+        <div className='container'>
+          <Alert alert={alert} />
+          <Switch>
+            <Route
+              exact
+              path='/'
+              render={(
+                props // we have to add Fragment below, if not we would have two parent elements, i.e. Search and Users
+              ) => (
+                <Fragment>
+                  <Search
+                    searchUsers={searchUsers}
+                    clearUsers={clearUsers}
+                    showClear={users.length > 0 ? true : false}
+                    setAlert={showAlert}
                   />
-                )}
-              />
-            </Switch>
-          </div>
+                  <Users loading={loading} users={users} />
+                </Fragment>
+              )}
+            />
+            <Route exact path='/about' component={About} />
+            <Route
+              exact
+              path='/user/:login' //route param login, we will have access to id in our route (i.e. User) in props.match.params.login )
+              render={props => (
+                <User
+                  {...props}
+                  getUser={getUser}
+                  getUserRepos={getUserRepos}
+                  user={user}
+                  repos={repos}
+                  loading={loading}
+                />
+              )}
+            />
+          </Switch>
         </div>
-      </Router>
-    );
-  }
-}
+      </div>
+    </Router>
+  );
+};
 
 export default App;
